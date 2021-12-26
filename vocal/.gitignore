@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 # created by virtualenv automatically
 /vocal/pyvenv.cfg
+=======
+vocal/pyvenv.cfg
+vocal/.gitignore
+>>>>>>> 22657e3d341f3770e1a1bba51abb6bd0324d6622
