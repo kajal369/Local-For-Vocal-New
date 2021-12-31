@@ -57,7 +57,7 @@ end
 # Unset irrelevant variables.
 deactivate nondestructive
 
-set -gx VIRTUAL_ENV 'G:\LocalForVocal\local-for-vocal\vocal'
+set -gx VIRTUAL_ENV 'C:\Users\kajal\Desktop\local\vocal'
 
 # https://github.com/fish-shell/fish-shell/issues/436 altered PATH handling
 if test (echo $FISH_VERSION | head -c 1) -lt 3
@@ -88,9 +88,9 @@ if test -z "$VIRTUAL_ENV_DISABLE_PROMPT"
         # Prompt override provided?
         # If not, just prepend the environment name.
         if test -n ''
-            printf '%s%s' '' (set_color normal)
+            printf '(%s) ' ''
         else
-            printf '%s(%s) ' (set_color normal) (basename "$VIRTUAL_ENV")
+            printf '(%s) ' (basename "$VIRTUAL_ENV")
         end
 
         string join -- \n $prompt # handle multi-line prompts
