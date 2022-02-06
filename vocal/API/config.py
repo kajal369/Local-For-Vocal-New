@@ -1,0 +1,6 @@
+DB_NAME = "LocalHost"
+DB_USER = "root"
+DB_PASS = ""
+DB_HOST = "meramandir"
+SERVER_IP_ADDRESS = "localhost"
+SERVER_PORT = "80"
