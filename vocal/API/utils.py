@@ -4,7 +4,7 @@ from API import config
 def makeup_url(url):
     str1 = 'http://'
     server_ip = config.SERVER_IP_ADDRESS
-    url1 = str1 + server_ip +'/MeraMandir/' + url
+    url1 = str1 + server_ip +'/lfv/' + url
     return url1
 
 

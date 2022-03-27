@@ -1,146 +1,88 @@
 
     {% extends "signup/Global.html" %}
     {% block mainpage %}
-    <div class="d-flex">
-        <div class="card mt-3 mx-auto" style="min-width:20rem">
-            <div class="card-body">
-                <div class="text-center">
-                    <h4>Wel-Come to Local for Vocal</h4>
-                    {% if pagesteps.step1 %}
-                        <form id="login" onsubmit="process(event)">
-                            <div class="form-group my-4 mx-3 rounded"> 
-                                <input id="phone" type="tel" name="phone" class="form-control rounded" Placeholder="Mobile No." />
-                                <div id="otpsendcontainer" class="mt-3">
-                                    <a class="btn btn-primary text-white mt-2 rounded" id="validatephone">Get OTP</a>
-                                    <input type="submit" id="validatephone1" class="btn btn-primary text-white mt-2 rounded" value="Get OTP" hidden />
-                                    </div>
-                                    <div id="otpsendingcontainer" class="mt-3">
-                                    <a class="btn btn-sm mt-3 rounded btn-primary">Sending  <i class="fa fa-spinner fa-pulse" aria-hidden="true"></i></a>
-                                    </div>
-                            </div>
-                        </form>
-                        <div style="display:none">
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input type="text" id="hiddenno" name="hiddenno" />
-                                <button type="submit" id="sendotp" name="sendotp" hidden>submit</button>
-                            </form>
-                            </div>
-                            <script>
-                            $('#otpsendingcontainer').hide();
-                            $('#validatephone').click(function(){
-                                var phonepattern = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
-                                if ($('#phone').val().length === 0) {
-                                    Toastmessage('Phone Number not filled!')
-                                }
-                                else if (!phonepattern.test($('#phone').val())) {
-                                    Toastmessage('Please Enter Valid Phone number!')
-                                }else{
-                                    $('#validatephone1').click();
-                                }
-                            });
-                            </script>
-                        <script>
-                            const phoneInputField = document.querySelector("#phone");
-                            const phoneInput = window.intlTelInput(phoneInputField, {
-                                preferredCountries: ["in"],
-                                utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
-                            });
-                            const info = document.querySelector(".alert-info");
-                            function process(event) {
-                                event.preventDefault();
-                                const phoneNumber = phoneInput.getNumber();
-                                console.log('phoneNumber',phoneNumber);
-                                if(phoneNumber.length<1)
-                                {
-                                    Toastmessage("Enter Mobile Number");
-                                }else{
-                                const msg = "Verifying"+phoneNumber;
-                                $('#otpsendcontainer').hide();
-                                $('#otpsendingcontainer').show();
-                                $('#hiddenno').val(phoneNumber);
-                                $('#sendotp').click();
-                                Toastmessage(msg);
-                                }
-                            }
-                            </script>
-                    {% elif pagesteps.step2 %}  
-                        <form method="POST">
-                            {% csrf_token %}
+        <div class="d-flex">
+            <div class="card mt-3 mx-auto" style="min-width:20rem">
+                <div class="card-body">
+                    <div class="text-center">
+                        <h4>Wel-Come to Local for Vocal</h4>
+                            <form id="login" onsubmit="process(event)">
                                 <div class="form-group my-4 mx-3 rounded"> 
-                                    <input class="form-class" type="number" onKeyUp="OTPLength(1)" pattern="[0-9]*" value=""  id="otc-1" name="otc-1" required>
-                                    <input class="form-class" type="number" onKeyUp="OTPLength(2)" pattern="[0-9]*" value=""  id="otc-2" name="otc-2" required>
-                                    <input class="form-class" type="number" onKeyUp="OTPLength(3)" pattern="[0-9]*" value=""  id="otc-3" name="otc-3" required>
-                                    <input class="form-class" type="number" onKeyUp="OTPLength(4)" pattern="[0-9]*" value=""  id="otc-4" name="otc-4" required>
-                                    <input class="form-class" type="number" onKeyUp="OTPLength(5)" pattern="[0-9]*" value=""  id="otc-5" name="otc-5" required>
-                                    <input class="form-class" type="number" onKeyUp="OTPLength(6)" pattern="[0-9]*" value=""  id="otc-6" name="otc-6" required>
-                                    <div id="otpcontainer" class="mt-3">
-                                        <a class="btn btn-primary text-white mt-2 rounded" id="validateotp">Verify OTP</a>
-                                        <input type="submit" id="validateotp" class="btn btn-primary text-white mt-2 rounded" value="Get OTP" hidden />
+                                    <input id="phone" type="tel" name="phone" class="form-control rounded" Placeholder="Mobile No." />
+                                    <input id="password" type="password" name="password" class="form-control rounded mt-3" Placeholder="Password" />
+                                    {% if iserror %}
+                                        <div class="text-center mt-2">
+                                            <p class="text-danger">{{msg}}</p>
+                                        </div>
+                                    {% endif %}
+                                    <div id="otpsendcontainer" class="mt-3">
+                                        <a class="btn btn-primary text-white mt-2 rounded" id="validatephone">Login</a>
+                                        <input type="submit" id="validatephone1" class="btn btn-primary text-white mt-2 rounded" value="Get OTP" hidden />
                                     </div>
                                     <div id="otpsendingcontainer" class="mt-3">
-                                        <a class="btn btn-sm mt-3 rounded btn-primary">Verifying  <i class="fa fa-spinner fa-pulse" aria-hidden="true"></i></a>
+                                        <a class="btn btn-sm mt-3 rounded btn-primary text-white">Login-in  <i class="fa fa-spinner fa-pulse" aria-hidden="true"></i></a>
+                                    </div>
+                                    <div class="text-center mt-2">
+                                        <p>Not register yet ? <a class="text-primary" href="/ragistration">Signup</a></p>
                                     </div>
                                 </div>
                             </form>
-
-                            <script>
+                            <div style="display:none">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <input type="text" id="hiddenno" name="hiddenno" />
+                                    <input type="password" id="hiddenpass" name="hiddenpass" />
+                                    <button type="submit" id="VerifyMobilePass" name="VerifyMobilePass" hidden>submit</button>
+                                </form>
+                                </div>
+                                <script>
                                 $('#otpsendingcontainer').hide();
-                                $('#validateotp').click(function(){
-                                    var opt=$('#otc-1').val()+""+$('#otc-2').val()+""+$('#otc-3').val()+""+$('#otc-4').val()+""+$('#otc-5').val()+""+$('#otc-6').val();
-                                    if(opt.length==6)
-                                    {
-                                        
-                                        $('#otpcontainer').hide();
-                                        $('#otpsendingcontainer').show();
-                                    }else
-                                    {
-                                        Toastmessage('Enter Valid OTP');
+                                $('#validatephone').click(function(){
+                                    var phonepattern = /^[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}$/im;
+                                    if ($('#phone').val().length === 0) {
+                                        Toastmessage('Phone Number not filled!')
+                                    }
+                                    else if (!phonepattern.test($('#phone').val())) {
+                                        Toastmessage('Please Enter Valid Phone number!')
+                                    }else{
+                                        $('#validatephone1').click();
                                     }
                                 });
-                                function OTPLength(id){
-                                    var ids=parseInt(id);
-                                    var val=document.getElementById('otc-'+id).value;
-                                    var lengths=parseInt(val.length);
-                                    console.log('val is '+val+' lengths '+lengths);
-                                    if(val =='e' || val =='E' || val =='.' || val =='-')
+                                </script>
+                            <script>
+                                const phoneInputField = document.querySelector("#phone");
+                                const phoneInput = window.intlTelInput(phoneInputField, {
+                                    preferredCountries: ["in"],
+                                    utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                                });
+                                const info = document.querySelector(".alert-info");
+                                function process(event) {
+                                    event.preventDefault();
+                                    const phoneNumber = phoneInput.getNumber();
+                                    console.log('phoneNumber',phoneNumber);
+                                    if(phoneNumber.length<1)
                                     {
-                                        console.log('eeeee');
-                                        $('#otc-'+id).val('');
-                                    }
-                                    if(lengths>1)
-                                    {
-                                        console.log('hethh')
-                                        $('#otc-'+id).val(val[1]);
-                                        if(ids<6)
+                                        Toastmessage("Enter Mobile Number");
+                                    }else{
+                                        if($('#password').val()=="")
                                         {
-                                            ids+=1;
-                                            document.getElementById('otc-'+ids).focus();
-                                        }
-                                    }
-                                    if(lengths==1)
-                                    {
-                                        console.log('tt')
-                                        if(ids<6)
-                                        {
-                                            ids+=1;
-                                            document.getElementById('otc-'+ids).focus();
-                                        }
-                                    }
-                                    if(lengths==0)
-                                    {
-                                        console.log('bb')
-                                        if(ids>1)
-                                        {
-                                            ids-=1;
-                                            document.getElementById('otc-'+ids).focus();
+                                            Toastmessage("Enter Password");
+                                        }else{
+                                        const msg = "Verifying"+phoneNumber;
+                                        $('#otpsendcontainer').hide();
+                                        $('#otpsendingcontainer').show();
+                                        $('#hiddenno').val(phoneNumber);
+                                        $('#hiddenpass').val($('#password').val())
+                                        $('#VerifyMobilePass').click();
+                                        Toastmessage(msg);
                                         }
                                     }
                                 }
                             </script>
-                    {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+                  
+                
     {% endblock %}

@@ -1,5 +1,74 @@
 {% extends "signup/Global.html" %}
-    {% block mainpage %}
+{% load static %}
+{% block extrahead %}
+<!--input tel-->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+
+<title>Register</title>
+<style>
+    .reginput1{
+      margin-top: 2vh;
+      background-color: #F4C430 !important;
+      border:2px solid white;
+      color:white;
+    }
+  
+    .reginput1::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+      color: white;
+      opacity: 1; /* Firefox */
+    }
+  
+    .reginput1:focus {
+      background-color: transparent;
+      border: 2px solid white !important;
+      color:white !important;
+    }
+    .ProfileImage{
+      border-radius:50%;
+      height:10rem;
+      width:10rem;
+    }
+
+    input[type="radio"]:checked+label,
+    .Checked+label {
+    background: #FF9933;
+    }
+
+    .UserType label {
+    padding: 5px;
+    border: 1px solid #CCC;
+    cursor: pointer;
+    z-index: 90;
+    }
+
+    .inputcheck{
+    opacity:0;
+    display:none;
+    }
+    #localcityId::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: black;
+        opacity: 1; /* Firefox */
+    }
+
+    .btn-orange{
+        background-color:#FF9933;
+        color:white;
+        font-weight:bold;
+        letter-spacing: 3px;
+        padding: 5px 20px;
+    }
+
+    .btn-orange:hover{
+        background-color:white;
+        color:#FF9933;
+        letter-spacing: 3px;
+        padding: 5px 20px;
+        }
+  </style>
+
+{% endblock %}
+{% block mainpage %}
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-lg-5">
@@ -8,44 +77,406 @@
                         <div class="card-header justify-content-center"><h3 class="font-weight-light my-4">Ragistration</h3></div>
                         <div class="card-body">
                             <!-- Login form-->
-                            <form>
-                                <!-- Form Group (email address)-->
-                                <div class="form-group">
-                                    <label class="small mb-1" for="inputMobile">Number</label>
-                                    <input class="form-control py-4" id="inputMobile" type="number" placeholder="Enter Mobile Number" />
-                                </div>
-                                <!-- Form Group (password)-->
-                                    <div class="form-group">
-                                    <label class="small mb-1" for="inputEmail">Email</label>
-                                    <input class="form-control py-4" id="inputEmail" type="password" placeholder="Enter Email" />
-                                </div>
-                                <div class="form-group">
-                                    <label class="small mb-1" for="inputCity">Email</label>
-                                    <input class="form-control py-4" id="inputCity"  placeholder="Enter City" />
-                                </div>
-                                <div class="form-group">
-                                    <label class="small mb-1" for="inputPin">Email</label>
-                                    <input class="form-control py-4" id="inputpin"  placeholder="Enter pincode of your city" />
-                                </div>
-                                <!--   Form Group (remember password checkbox)-->
-                                <!-- <div class="form-group">
-                                    <div class="custom-control custom-checkbox">
-                                        <input class="custom-control-input" id="rememberPasswordCheck" type="checkbox" />
-                                        <label class="custom-control-label" for="rememberPasswordCheck">do you have any bussiness</label>
+                            {% if progress.step1 %}
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="text-center ">
+                                        <img class="ProfileImage " id="ProfileImage" src="{% static 'images/icons/ProfileIcon.png'%}">
+                                        <input type="file" onchange="encodeImageFileAsURL(this)" id="imagefile" hidden/>
+                                        <input type="text" id="imgurl" name="imgurl" hidden />
+                                    <div>
+                                    <div class="form-group mt-3">
+                                        <input id="phone" type="tel" name="phone" class="from-control rounded " style="min-width:34vw" onChange="process(event)" Placeholder="Mobile No." />
+                                        <input id="hiddenno" type="text" name="hiddenno" hidden/>
                                     </div>
-                                </div>
-                                Form Group (login box)-->
-                                <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
-                                    <a class="small" href="auth-password-basic.html">Do you want enter Business details?</a>
-                                    <a class="btn btn-primary" href="index.html">next</a>
-                                </div>
-                            </form>
+                                    <div class="form-group mt-2">
+                                        <input class="form-control py-2 px-2" id="emailadd" name="emailadd"  type="email" placeholder="Enter email address" />
+                                    </div>
+                                    <div class="form-group mt-2">
+                                        <input class="form-control py-2 px-2" id="name" name="name"  type="text" placeholder="Enter your name" />
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-4 ">
+                                            <h4 class="mt-2 mb-n2 text-black">Country</h4>
+                                            <select name="country" class="countries form-control" id="countryId">
+                                                <option value="">Select Country</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4 col-6">
+                                            <h4 class="mt-2 mb-n2  text-black">State</h4>
+                                            <select name="state" class="states form-control" id="stateId">
+                                                <option value="">Select State</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-4 col-6">
+                                            <h4 class="mt-2 mb-n2 text-black">City</h4>        
+                                            <select name="city" class="cities form-control" id="cityId">
+                                                <option value="">Select City</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12 mt-2">
+                                            <input class="form-control" id="Lcity" name="Lcity" type="text"  placeholder="local city/village name">
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <a class="btn btn-primary text-white mt-3" id="registerbtn">Register</a>
+                                        <button type="submit" id="register" name="register" hidden></button>
+                                    </div>
+                                    
+                                    
+                                </form>
+                                <script>
+                                    const phoneInputField = document.querySelector("#phone");
+                                    const phoneInput = window.intlTelInput(phoneInputField, {
+                                      preferredCountries: ["in"],
+                                      utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/utils.js",
+                                    });
+                                    const info = document.querySelector(".alert-info");
+                                    function process(event) {
+                                      event.preventDefault();
+                                      const phoneNumber = phoneInput.getNumber();
+                                      if(phoneNumber.length<1)
+                                      {
+                                          Toastmessage("Enter Mobile Number");
+                                      }else{
+                                      const msg = "Verifying"+phoneNumber;
+                                      $('#hiddenno').val(phoneNumber);
+                                      console.log("Mobile no . "+phoneNumber);
+                                      
+                                      }
+                                    } 
+                              
+                                    
+                                    
+                                  </script>
+                            {% elif progress.step2 %}
+
+                            {% elif progress.step3 %}
+
+                            {% endif %}
+
                         </div>
                         <div class="card-footer text-center">
-                            <div class="small"><a href="auth-register-basic.html">already an account? Sign in!</a></div>
+                            <div class="small"><a href="/login">already an account? Sign in!</a></div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        <script>
+            var imagebase64 = "";  
+            function encodeImageFileAsURL(element) {  
+                var file = element.files[0];  
+                var reader = new FileReader();  
+                reader.onloadend = function() {  
+                    imagebase64 = reader.result;  
+                    console.log('imagebase64 is ',imagebase64);  
+                    $('#ProfileImage').attr('src',imagebase64);
+                    $('#imgurl').val(imagebase64);
+                  }  
+                reader.readAsDataURL(file);
+            }  
+            $('#ProfileImage').click(function(){
+                $('#imagefile').click();
+              });
+
+            $('#registerbtn').click(function(){
+                if($('#imgurl').val()!="")
+                {
+                    //Mobile
+                    if($('#hiddenno').val()!="")
+                    {
+                        if($('#emailadd').val()!="")
+                        {
+                            if($('#name').val()!="")
+                            {
+                                if($('#countryId').val()==''){
+                                    Toastmessage("Select Country");
+                                }else{
+                                    if($('#stateId').val()==''){
+                                        Toastmessage("Select State");
+                                    }else{
+                                        if($('#cityId').val()==''){
+                                            Toastmessage("Select City");
+                                        }else{
+                                            if($('#localcityId').val()==''){
+                                                Toastmessage("Select Local City/village");
+                                            }else{
+                                                $('#register').click();
+                                            }   
+                                        }   
+                                    }   
+                                }
+                            }else{
+                                Toastmessage("Add Name");    
+                            }
+                        }else{
+                            Toastmessage("Add Email Address");
+                        }
+                    }else{
+                        Toastmessage("Add Mobile no.");
+                    }
+                }else{
+                    Toastmessage("Upload Image");
+                }
+            });
+        </script>
+    </script>
+    <script>
+      //Script for country state and city name
+      function ajaxCall() {
+            this.send = function(data, url, method, success, type) {
+                type = type||'json';
+                var successRes = function(data) {
+                    success(data);
+                }
+                
+                var errorRes = function(e) {
+                    console.log(e);
+                }
+                jQuery.ajax({
+                    url: url,
+                    type: method,
+                    data: data,
+                    success: successRes,
+                    error: errorRes,
+                    dataType: type,
+                    timeout: 60000
+                });
+        
+            }
+        
+        }
+        
+        function locationInfo() {
+            var rootUrl = "https://geodata.solutions/api/api.php";
+            //now check for set values
+            var addParams = '';
+            if(jQuery("#gds_appid").length > 0) {
+                addParams += '&appid=' + jQuery("#gds_appid").val();
+            }
+            if(jQuery("#gds_hash").length > 0) {
+                addParams += '&hash=' + jQuery("#gds_hash").val();
+            }
+        
+            var call = new ajaxCall();
+        
+            this.confCity = function(id) {
+                var url = rootUrl+'?type=confCity&countryId='+ jQuery('#countryId option:selected').attr('countryid') +'&stateId=' + jQuery('#stateId option:selected').attr('stateid') + '&cityId=' + id;
+                var method = "post";
+                var data = {};
+                call.send(data, url, method, function(data) {
+                });
+            };
+        
+        
+            this.getCities = function(id) {
+                jQuery(".cities option:gt(0)").remove();
+                var stateClasses = jQuery('#cityId').attr('class');
+        
+                var cC = stateClasses.split(" ");
+                cC.shift();
+                var addClasses = '';
+                if(cC.length > 0)
+                {
+                    acC = cC.join();
+                    addClasses = '&addClasses=' + encodeURIComponent(acC);
+                }
+                var url = rootUrl+'?type=getCities&countryId='+ jQuery('#countryId option:selected').attr('countryid') +'&stateId=' + id + addParams + addClasses;
+                var method = "post";
+                var data = {};
+                jQuery('.cities').find("option:eq(0)").html("Please wait..");
+                call.send(data, url, method, function(data) {
+                    jQuery('.cities').find("option:eq(0)").html("Select City");
+                    if(data.tp == 1){
+                        var listlen = Object.keys(data['result']).length;
+        
+                        if(listlen > 0)
+                        {
+                            jQuery.each(data['result'], function(key, val) {
+        
+                                var option = jQuery('<option />');
+                                option.attr('value', val).text(val);
+                                jQuery('.cities').append(option);
+                            });
+                        }
+                        else
+                        {
+                            var usestate = jQuery('#stateId option:selected').val();
+                            var option = jQuery('<option />');
+                            option.attr('value', usestate).text(usestate);
+                            option.attr('selected', 'selected');
+                            jQuery('.cities').append(option);
+                        }
+        
+                        jQuery(".cities").prop("disabled",false);
+                    }
+                    else{
+                        alert(data.msg);
+                    }
+                });
+            };
+        
+            this.getStates = function(id) {
+                jQuery(".states option:gt(0)").remove();
+                jQuery(".cities option:gt(0)").remove();
+                //get additional fields
+                var stateClasses = jQuery('#stateId').attr('class');
+        
+                var cC = stateClasses.split(" ");
+                cC.shift();
+                var addClasses = '';
+                if(cC.length > 0)
+                {
+                    acC = cC.join();
+                    addClasses = '&addClasses=' + encodeURIComponent(acC);
+                }
+                var url = rootUrl+'?type=getStates&countryId=' + id + addParams  + addClasses;
+                var method = "post";
+                var data = {};
+                jQuery('.states').find("option:eq(0)").html("Please wait..");
+                call.send(data, url, method, function(data) {
+                    jQuery('.states').find("option:eq(0)").html("Select State");
+                    if(data.tp == 1){
+                        jQuery.each(data['result'], function(key, val) {
+                            var option = jQuery('<option />');
+                            option.attr('value', val).text(val);
+                            option.attr('stateid', key);
+                            jQuery('.states').append(option);
+                        });
+                        jQuery(".states").prop("disabled",false);
+                    }
+                    else{
+                        alert(data.msg);
+                    }
+                });
+            };
+        
+            this.getCountries = function() {
+                //get additional fields
+                var countryClasses = jQuery('#countryId').attr('class');
+        
+                var cC = countryClasses.split(" ");
+                cC.shift();
+                var addClasses = '';
+                if(cC.length > 0)
+                {
+                    acC = cC.join();
+                    addClasses = '&addClasses=' + encodeURIComponent(acC);
+                }
+        
+                var presel = false;
+                var iip = 'N';
+                jQuery.each(cC, function( index, value ) {
+                    if (value.match("^presel-")) {
+                        presel = value.substring(7);
+        
+                    }
+                    if(value.match("^presel-byi"))
+                    {
+                        var iip = 'Y';
+                    }
+                });
+        
+        
+                var url = rootUrl+'?type=getCountries' + addParams + addClasses;
+                var method = "post";
+                var data = {};
+                jQuery('.countries').find("option:eq(0)").html("Please wait..");
+                call.send(data, url, method, function(data) {
+                    jQuery('.countries').find("option:eq(0)").html("Select Country");
+        
+                    if(data.tp == 1){
+                        if(presel == 'byip')
+                        {
+                            presel = data['presel'];
+                            console.log('2 presel is set as ' + presel);
+                        }
+        
+        
+                        if(jQuery.inArray("group-continents",cC) > -1)
+                        {
+                            var $select = jQuery('.countries');
+                            console.log(data['result']);
+                            jQuery.each(data['result'], function(i, optgroups) {
+                                var $optgroup = jQuery("<optgroup>", {label: i});
+                                if(optgroups.length > 0)
+                                {
+                                    $optgroup.appendTo($select);
+                                }
+        
+                                jQuery.each(optgroups, function(groupName, options) {
+                                    var coption = jQuery('<option />');
+                                    coption.attr('value', options.name).text(options.name);
+                                    coption.attr('countryid', options.id);
+                                    if(presel) {
+                                        if (presel.toUpperCase() == options.id) {
+                                            coption.attr('selected', 'selected');
+                                        }
+                                    }
+                                    coption.appendTo($optgroup);
+                                });
+                            });
+                        }
+                        else
+                        {
+                            jQuery.each(data['result'], function(key, val) {
+                                var option = jQuery('<option />');
+                                option.attr('value', val).text(val);
+                                option.attr('countryid', key);
+                                if(presel)
+                                {
+                                    if(presel.toUpperCase() ==  key)
+                                    {
+                                        option.attr('selected', 'selected');
+                                    }
+                                }
+                                jQuery('.countries').append(option);
+                            });
+                        }
+                        if(presel)
+                        {
+                            jQuery('.countries').trigger('change');
+                        }
+                        jQuery(".countries").prop("disabled",false);
+                    }
+                    else{
+                        alert(data.msg);
+                    }
+                });
+            };
+        
+        }
+        
+        jQuery(function() {
+            var loc = new locationInfo();
+            loc.getCountries();
+            jQuery(".countries").on("change", function(ev) {
+                var countryId = jQuery("option:selected", this).attr('countryid');
+                if(countryId != ''){
+                    loc.getStates(countryId);
+                }
+                else{
+                    jQuery(".states option:gt(0)").remove();
+                }
+            });
+            jQuery(".states").on("change", function(ev) {
+                var stateId = jQuery("option:selected", this).attr('stateid');
+                if(stateId != ''){
+                    loc.getCities(stateId);
+                }
+                else{
+                    jQuery(".cities option:gt(0)").remove();
+                }
+            });
+        
+            jQuery(".cities").on("change", function(ev) {
+                var cityId = jQuery("option:selected", this).val();
+                if(cityId != ''){
+                    loc.confCity(cityId);
+                }
+            });
+        });
+    </script>
     {% endblock %}
