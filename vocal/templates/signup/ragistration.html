@@ -118,7 +118,12 @@
                                             <input class="form-control" id="Lcity" name="Lcity" type="text"  placeholder="local city/village name">
                                         </div>
                                     </div>
-
+                                    <div class="mt-2 form-group">
+                                        <input type="password" id="password" name="password" placeholder="Enter Password" />
+                                    </div>
+                                    <div class="mt-2 form-group">
+                                        <input type="password" id="passwordC" name="passwordC" placeholder="Enter Password" />
+                                    </div>
                                     <div>
                                         <a class="btn btn-primary text-white mt-3" id="registerbtn">Register</a>
                                         <button type="submit" id="register" name="register" hidden></button>
@@ -151,9 +156,38 @@
                                     
                                   </script>
                             {% elif progress.step2 %}
-
+                            <div id="OtpContainer">
+                                <form method="POST">
+                                    {% csrf_token %}
+                                    <div class="text-center">
+                                        <h1 class="text-primary">Verify OTP to Continue</h1>
+                                        <p>Your OTP send to {{sendotpmobile}} mobile no.</p>
+                                    </div>
+                                    <div class="form-group my-4 mx-3 d-flex rounded"> 
+                                        <input class="form-control mx-1" type="text" onKeyUp="OTPLength(1)" pattern="[0-9]*" value=""  id="otc-1" name="otc-1" required>
+                                        <input class="form-control mx-1" type="text" onKeyUp="OTPLength(2)" pattern="[0-9]*" value=""  id="otc-2" name="otc-2" required>
+                                        <input class="form-control mx-1" type="text" onKeyUp="OTPLength(3)" pattern="[0-9]*" value=""  id="otc-3" name="otc-3" required>
+                                        <input class="form-control mx-1" type="text" onKeyUp="OTPLength(4)" pattern="[0-9]*" value=""  id="otc-4" name="otc-4" required>
+                                        <input class="form-control mx-1" type="text" onKeyUp="OTPLength(5)" pattern="[0-9]*" value=""  id="otc-5" name="otc-5" required>
+                                        <input class="form-control mx-1" type="text" onKeyUp="OTPLength(6)" pattern="[0-9]*" value=""  id="otc-6" name="otc-6" required>
+                                    </div>
+                                    <div id="verifyotpbtnC" class="mt-3 text-center">
+                                        <a class="btn btn-primary text-white mt-2 rounded" id="validateotp">Verify OTP</a>
+                                    </div>
+                                    <div id="otpsendingcontainer" class="mt-3 text-center">
+                                        <a class="btn btn-primary text-white mt-2 rounded">Verifying  <i class="fa fa-spinner fa-pulse pl-1" aria-hidden="true"></i></a>
+                                        <input type="text" id="formotp" name="formotp" hidden/>
+                                        <input type="submit" name="verifyotpbtn" id="verifyotpbtn" hidden/>
+                                    </div>
+                                </form>
+                            </div>
                             {% elif progress.step3 %}
 
+                            {% endif %}
+                            {% if iserror %}
+                                <div class="my-2 text-center">
+                                    <p class="text-danger">{{errormsg}}</p>
+                                </div>
                             {% endif %}
 
                         </div>
@@ -164,6 +198,7 @@
                 </div>
             </div>
         </div>
+        {% if  progress.step1 %}
         <script>
             var imagebase64 = "";  
             function encodeImageFileAsURL(element) {  
@@ -203,7 +238,23 @@
                                             if($('#localcityId').val()==''){
                                                 Toastmessage("Select Local City/village");
                                             }else{
-                                                $('#register').click();
+                                                if($('#password').val()=='')
+                                                {
+                                                    Toastmessage("Please Enter Password");
+                                                }else{
+                                                    if($('#password').val().length<6)
+                                                    {
+                                                        Toastmessage("Password must atleat 6 digit");
+                                                    }else{
+                                                        if($('#password').val()!=$('#passwordC').val())
+                                                        {
+                                                            Toastmessage("Password not matched");
+                                                        }else{
+                                                            $('#register').click();            
+                                                        }
+                                                    }   
+                                                }
+                                                
                                             }   
                                         }   
                                     }   
@@ -222,7 +273,6 @@
                 }
             });
         </script>
-    </script>
     <script>
       //Script for country state and city name
       function ajaxCall() {
@@ -291,11 +341,10 @@
                     jQuery('.cities').find("option:eq(0)").html("Select City");
                     if(data.tp == 1){
                         var listlen = Object.keys(data['result']).length;
-        
+                        console.log('total citied : '+listlen);
                         if(listlen > 0)
                         {
                             jQuery.each(data['result'], function(key, val) {
-        
                                 var option = jQuery('<option />');
                                 option.attr('value', val).text(val);
                                 jQuery('.cities').append(option);
@@ -479,4 +528,62 @@
             });
         });
     </script>
+    {% endif %}
+    {% if  progress.step2 %}
+    <script>
+        $('#otpsendingcontainer').hide();
+        $('#validateotp').click(function(){
+            var opt=$('#otc-1').val()+""+$('#otc-2').val()+""+$('#otc-3').val()+""+$('#otc-4').val()+""+$('#otc-5').val()+""+$('#otc-6').val();
+            if(opt.length==6)
+            {
+                console.log('user otp : '+opt);
+                $('#formotp').val(opt);
+                $('#verifyotpbtnC').hide();
+                $('#otpsendingcontainer').show();
+                $('#verifyotpbtn').click();
+            }else
+            {
+                Toastmessage('Enter Valid OTP');
+            }
+        });
+        function OTPLength(id){
+            var ids=parseInt(id);
+            var val=document.getElementById('otc-'+id).value;
+            var lengths=parseInt(val.length);
+            console.log('val is '+val+' lengths '+lengths);
+            if(val =='e' || val =='E' || val =='.' || val =='-')
+            {
+                console.log('eeeee');
+                $('#otc-'+id).val('');
+            }
+            if(lengths>1)
+            {
+                console.log('hethh')
+                $('#otc-'+id).val(val[1]);
+                if(ids<6)
+                {
+                    ids+=1;
+                    document.getElementById('otc-'+ids).focus();
+                }
+            }
+            if(lengths==1)
+            {
+                if(ids<6)
+                {
+                    ids+=1;
+                    document.getElementById('otc-'+ids).focus();
+                }
+            }
+            if(lengths==0)
+            {
+                console.log('bb')
+                if(ids>1)
+                {
+                    ids-=1;
+                    document.getElementById('otc-'+ids).focus();
+                }
+            }
+        }
+    </script>
+    {% endif %}
     {% endblock %}
