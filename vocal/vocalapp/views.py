@@ -159,7 +159,7 @@ def registration(request):
     iserror = False
     errormsg = "NA"            
     progressstep = {"step1":True,"step2":False,"step3":False,"step4":False}
-    return render(request,'signup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg})
+    return render(request,'si gnup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg})
 
 def randomN(n):
     range_start = 10**(n-1)
