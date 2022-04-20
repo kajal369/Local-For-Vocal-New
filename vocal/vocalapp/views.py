@@ -17,7 +17,7 @@ def login(request):
         password=request.POST.get('hiddenpass')
         url = utils.makeup_url('cruduser.py')
         payload = {'req':'checklogin','mobile':mobileno,'password':password}
-        print(payload)
+        #print(payload)
         response = requests.post(url,data=payload).json()
         if response['response']:
             request.session['isregistration']=False
