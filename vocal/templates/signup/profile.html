@@ -1,0 +1,99 @@
+
+    {% extends "signup/Global.html" %}
+    {% load static %}
+    {% block extrahead %}
+        <style>
+            .ProfileImage{
+                border-radius:50%;
+                height:10rem;
+                width:10rem;
+            }
+        </style>
+    {% endblock %}
+    {% block mainpage %}
+        <div class="d-flex">
+            <div class="card mt-3 mx-lg-10 mx-md-5 mx-2" style="min-width:50vw">
+                <div class="card-body">
+                    <div class="text-center">
+                        <div class="row">
+                            <div class="col-1 text-left">
+                                <a class="btn btn-primary text-white rounded" href="/">Home</a>
+                            </div>
+                            <div class="col-11 text-left pt-2">
+                                <h4>Wel-Come to Local for Vocal {{userdata.name}}</h4>
+                            </div>
+                        </div>
+                        
+                        <a>Your Profile details is -</a>
+                        <div class="text-center ">
+                            <img class="ProfileImage " id="ProfileImage" src="{{userdata.avatar}}">
+                        </div>
+                        <div class="row mt-2 p-2 text-left">
+                            <div class="col-md-6 form-group">
+                                <label  for="Pemail">Email</label>
+                                <input type="text" class="inputfield form-control" id="Pemail" value="{{userdata.email}}" disabled/>
+                            </div>
+                            <div class="col-md-6 form-group">
+                                <label for="Pmobile">Mobile</label>
+                                <input type="text" class="inputfield form-control" id="Pmobile" value="{{userdata.mobile}}" disabled/>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label  for="Pstate"><img src="{% static 'image/india.png' %}" style="height:20px;"> State</label>
+                                <input type="text" class="inputfield form-control" id="Pstate" value="{{userdata.state}}" disabled/>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label for="Pcity">City</label>
+                                <input type="text" class="inputfield form-control" id="Pcity" value="{{userdata.city}}" disabled/>
+                            </div>
+                            <div class="col-md-4 form-group">
+                                <label for="Pscity">Area / Local City</label>
+                                <input type="text" class="inputfield form-control" id="Pscity" value="{{userdata.Lcity}}" disabled/>
+                            </div>
+                        </div>
+                        {% if userdata.isbusiness %}
+                            <div class="text-left">
+                                <h3>Your Business Detail is : -</h3>
+                                {% if AllBusiness.response %}
+                                    {% for bus in AllBusiness.data %}
+                                        <div class="row">
+                                            <!--AllBusiness-->
+                                            <div class="col-12 text-center form-group">
+                                                <img class="img-fluid rounded" style="max-height:20rem"  src="{{bus.bannerimg}}" />
+                                            </div>
+                                            <div class="col-6 text-left form-group">
+                                                <label for="Pbname">Business Name</label>
+                                                <input type="text" class="inputfield form-control" id="Pbname" value="{{bus.bname}}" disabled/>
+                                            </div>
+                                            <div class="col-6 text-left form-group">
+                                                <label for="Pemail">Business email</label>
+                                                <input type="text" class="inputfield form-control" id="Pemail" value="{{bus.email}}" disabled/>
+                                            </div>
+                                            <div class="col-6 text-left form-group">
+                                                <label for="Pcategory">Business Category</label>
+                                                <input type="text" class="inputfield form-control" id="Pemail" value="{{bus.category}}" disabled/>
+                                            </div>
+                                            <div class="col-6 text-left form-group">
+                                                <label for="Ptiming">Timing</label>
+                                                <input type="text" class="inputfield form-control" id="Ptiming" value="{{bus.timing}}" disabled/>
+                                            </div>
+                                            <div class="col-12 text-left ">
+                                                {{bus.promotion |safe }}
+                                            </div>
+                                        </div>
+                                    {% endfor %}
+                                {% else %}
+
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                           
+                             
+                    </div>
+                </div>
+            </div>
+        </div>
+                  
+                
+    {% endblock %}
+    {% block extrascript %}
+    {% endblock %}

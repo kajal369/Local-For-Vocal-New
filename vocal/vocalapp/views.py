@@ -10,6 +10,7 @@ from API import config,utils
 
 # Create your views here.
 def login(request):
+
     if request.method == "POST" and 'VerifyMobilePass' in request.POST:
         print('VerifyMobilePass function is called')
         mobileno=request.POST.get('hiddenno')
@@ -58,7 +59,28 @@ def login(request):
             return render(request,'signup/login.html',{'iserror':iserror,'msg':msg,'LoginStatus':request.session['lfvloginstatus']})        
     iserror = False
     msg = ""
-    return render(request,'signup/login.html',{'iserror':iserror,'msg':msg,'LoginStatus':'0'})        
+    if 'islfvuserlogin' in request.session:
+        if request.session['islfvuserlogin']:
+            islogin=True
+            userdata = {
+                'name':request.session['lfvusername'],
+                'email':request.session['lfvuseremail'],
+                'mobile':request.session['lfvusermobile'],
+                'state':request.session['lfvuserstate'],
+                'city':request.session['lfvusercity'],
+                'Lcity':request.session['lfvuserlcity'],
+                'isbusiness':request.session['islfvuserbusiness'],
+                'avatar':request.session['lfvuserprofile'],
+                'country':request.session['lfvusercountry']
+            }
+            url = utils.makeup_url('crudbusiness.py')
+            payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
+            AllBusiness = requests.post(url,data=payload).json()
+            return render(request,'Dashboard/index.html',{'userdata':userdata,'AllBusiness':AllBusiness})
+        else:
+            return render(request,'signup/login.html',{'iserror':iserror,'msg':msg,'LoginStatus':'0'})        
+    else:
+        return render(request,'signup/login.html',{'iserror':iserror,'msg':msg,'LoginStatus':'0'})        
 def index(request):
     if 'islfvuserlogin' in request.session:
         if request.session['islfvuserlogin']:
@@ -73,7 +95,33 @@ def index(request):
                 'avatar':request.session['lfvuserprofile'],
                 'country':request.session['lfvusercountry']
             }
-            return render(request,'Dashboard/index.html',{'userdata':userdata})
+            url = utils.makeup_url('crudbusiness.py')
+            payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
+            AllBusiness = requests.post(url,data=payload).json()
+            return render(request,'Dashboard/index.html',{'userdata':userdata,'AllBusiness':AllBusiness})
+        else:
+            return redirect('login')
+    else:
+        return redirect('login')
+
+def business(request):
+    if 'islfvuserlogin' in request.session:
+        if request.session['islfvuserlogin']:
+            userdata = {
+                'name':request.session['lfvusername'],
+                'email':request.session['lfvuseremail'],
+                'mobile':request.session['lfvusermobile'],
+                'state':request.session['lfvuserstate'],
+                'city':request.session['lfvusercity'],
+                'Lcity':request.session['lfvuserlcity'],
+                'isbusiness':request.session['islfvuserbusiness'],
+                'avatar':request.session['lfvuserprofile'],
+                'country':request.session['lfvusercountry']
+            }
+            url = utils.makeup_url('crudbusiness.py')
+            payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
+            AllBusiness = requests.post(url,data=payload).json()
+            return render(request,'Business/viewbusiness.html',{'userdata':userdata,'AllBusiness':AllBusiness})
         else:
             return redirect('login')
     else:
@@ -84,8 +132,67 @@ def logout(request):
         del request.session[key]
     return redirect('login')
 
+
+def profile(request):
+    if 'islfvuserlogin' in request.session:
+        if request.session['islfvuserlogin']:
+            userdata = {
+                'name':request.session['lfvusername'],
+                'email':request.session['lfvuseremail'],
+                'mobile':request.session['lfvusermobile'],
+                'state':request.session['lfvuserstate'],
+                'city':request.session['lfvusercity'],
+                'Lcity':request.session['lfvuserlcity'],
+                'isbusiness':request.session['islfvuserbusiness'],
+                'avatar':request.session['lfvuserprofile'],
+                'country':request.session['lfvusercountry']
+            }
+
+            url = utils.makeup_url('crudbusiness.py')
+            payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
+            AllBusiness = requests.post(url,data=payload).json()
+            return render(request,'signup/profile.html',{'userdata':userdata,'AllBusiness':AllBusiness})
+        else:
+            return redirect('login')
+    else:
+        return redirect('login')
 def newbusiness(request):
-    return render(request,'Business/AddnewBusiness.html')
+    if 'islfvuserlogin' in request.session:
+        if request.session['islfvuserlogin']:
+
+            
+            if request.method == "POST" and  request.POST.get('req') == 'AddNewCategory':
+                print('Inside AddNewCategory function')
+                url = utils.makeup_url('crudbusiness.py')
+                payload = {'req':'addcategory','category':request.POST.get('category'),'type':request.POST.get('type')}
+                response = requests.post(url,data=payload).json()
+                return JsonResponse({'data':response},status=200)
+            if request.method == "POST" and  request.POST.get('req') == 'GetBusinessCategory':
+                #print(" inside GetBusinessCategory function")
+                AllCategory = getAllBusinessCategory()
+                #print(AllCategory)
+                return JsonResponse({'data':AllCategory},status=200)
+            if request.POST and request.POST.get('req') == 'AddBusiness':
+                mobile = request.session['lfvusermobile']
+                logo=request.POST.get('logo')
+                Bname=request.POST.get('Bname')
+                Bemail=request.POST.get('Bemail')
+                Btype=request.POST.get('Btype')
+                Bcategory=request.POST.get('Bcategory')
+                Boptime=request.POST.get('Boptime')
+                Bcltime=request.POST.get('Bcltime')
+                timing = str(Boptime)+' to '+str(Bcltime)
+                BDesc=request.POST.get('BDesc')
+                url = utils.makeup_url('crudbusiness.py')
+                payload = {'req':'addbusiness','mobile':mobile,'name':Bname,'category':Bcategory,'image':logo,'timing':timing,'email':Bemail,'promotion':BDesc,'type':Btype}
+                response = requests.post(url,data=payload).json()
+                return JsonResponse({'data':response},status=200)
+            return render(request,'Business/AddnewBusiness.html')
+        else:
+            return redirect('login')
+    else:
+        return redirect('login')
+
 def registration(request):
     if request.method == "POST" and 'register' in request.POST:
         print('inside register')
@@ -105,7 +212,7 @@ def registration(request):
             iserror = True
             errormsg = "Mobile Number Already Registered"
             progressstep = {"step1":True,"step2":False,"step3":False,"step4":False}
-            return render(request,'signup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg})
+            return render(request,'signup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg,'AllCategory':AllCategory})
         else:
             randomtop = randomN(6)
             request.session['tempotp'] = randomtop
@@ -119,7 +226,7 @@ def registration(request):
             iserror = False
             errormsg = "NA"
             progressstep = {"step1":False,"step2":True,"step3":False,"step4":False}
-            return render(request,'signup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg})
+            return render(request,'signup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg,})
 
     if request.method == "POST" and 'verifyotpbtn' in request.POST:
         userotp = request.POST.get('formotp')
@@ -153,13 +260,19 @@ def registration(request):
         else:
             #print('otp not matched')
             pagestep = {'step1':False,'step2':True}
-            return render(request,'Registration/registration.html',{'iserror':True,'errormsg':"Otp not matcheds!",'pagestep':pagestep})
+            return render(request,'Registration/registration.html',{'iserror':True,'errormsg':"Otp not matcheds!",'pagestep':pagestep,})
         
 
     iserror = False
     errormsg = "NA"            
     progressstep = {"step1":True,"step2":False,"step3":False,"step4":False}
-    return render(request,'si gnup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg})
+    return render(request,'signup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg,})
+
+def getAllBusinessCategory():
+    url = utils.makeup_url('crudbusiness.py')
+    payload = {'req':'getallcategory'}
+    response = requests.post(url,data=payload).json()
+    return response
 
 def randomN(n):
     range_start = 10**(n-1)

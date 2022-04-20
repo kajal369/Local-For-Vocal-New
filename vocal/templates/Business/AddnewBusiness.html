@@ -1,10 +1,382 @@
 {% extends "signup/Global.html" %}
 {% load static %}
 {% block extrahead %}
-<!--input tel-->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
-<title>My Business</title>
+    <!--input tel-->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/css/intlTelInput.css"/>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/17.0.8/js/intlTelInput.min.js"></script>
+    <title>My Business</title>
+    <script src="https://cdn.tiny.cloud/1/dshy1a6dex4u1o5abmlvqzs61ocs9dnqrsoelsza6xf13t6h/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script>
+    <style>
+        .ProfileImage{
+            border-radius:50%;
+            height:10rem;
+            width:10rem;
+          }   
+          
+          .errorborder{
+              border:2px solid red;
+          }
 
+          .hidediv{
+              display:none;
+          }
+    </style>
 {% endblock %}
 
+{% block mainpage %}
+    <div class="modal fade" id="AddnewBcateModal" tabindex="-1" role="dialog" aria-labelledby="AddnewBcateModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLongTitle">Add Category</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            </div>
+            <div class="modal-body form-group">
+                
+                <select id="Cbtype" class="form-control">
+                    <option value="Service">Service</option>
+                    <option value="Product">Product</option>
+                </select>
+                <input type="text" id="Cbcategory" class="form-control" />
+            </div> 
+            <div class="modal-footer">
+            <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="AddNewCategory()">Add Category</button>
+            </div>
+        </div>
+        </div>
+    </div>
+    <div class="container py-5  h-100">
+        <div class="row justify-content-center align-items-center">
+            <div class="col-md-8 col-10">
+                <div class="card shadow-2-strong card-registration" style="border-radius: 15px;">
+                    <div class="card-body p-4 p-md-5">
+                        <div class="text-center mb-3">
+                            <h3 class="mx-auto">Add Business</h3>
+                        </div>
+                        <div class="col-12 text-center">
+                                <img class="ProfileImage" id="ProfileImage" src="{% static 'images/icons/business.png'%}">
+                                <input type="file" onchange="encodeImageFileAsURL(this)" id="imagefile" accept="image/png, image/jpeg" hidden/>
+                                <input type="text" id="imgurl" name="imgurl" hidden />
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 col-12 my-2 form-group">
+                                <input type="text" class="form-control px-3 py-1" placeholder="Business Name" id="Bname"/>
+                            </div>
+                            <div class="col-md-6 col-12 my-2">
+                                <input type="email" class="form-control px-3 py-1" placeholder="Email" id="Bemail"/>
+                            </div>
+                            <div class="col-md-6 col-12 my-2 form-group">
+                                <label for="btype">Business Type</label>
+                                <select id="btype" class="form-control">
+                                    <option value="Please Select">Please Select</option>
+                                    <option value="Service">Service</option>
+                                    <option value="Product">Product</option>
+                                </select>
+                                <input type="text" id="Fbtype" hidden/>
+                            </div>
+                            <div class="col-md-6 col-12 my-2 form-group">
+                                <div class="row">
+                                    <div class="col-6 ">
+                                        <label for="bcategory">Business Category </label>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <button type="button" class="btn btn-sm btn-primary" data-toggle="modal" data-target="#AddnewBcateModal">
+                                            Add New Category
+                                        </button>
+                                    </div>
+                                </div>
+                                <select id="bcategory" class="form-control mt-1">
+                                </select>
+                                <input type="text" id="Fbcategory" hidden/>
+                                
+                            </div>
+                            <div class="col-12 my-2 form-group">
+                                <div class="row ">                                
+                                    <div class="col-5 my-2 form-group">
+                                        <label for="optime">Opening time <span id="Boptimeshow"></span></label>
+                                        <input type="time" onchange="onTimeChange('Boptime','optime')" class="form-control" id="optime"/>
+                                        <input type="text" id="Boptime" hidden/>
+                                    </div>
+                                    <div class="col-2 pt-5 text-center form-group">
+                                        To
+                                    </div>
+                                    <div class="col-5 my-2 form-group">
+                                        <label for="cltime">Closing time <span id="Bcltimeshow"></span></label>
+                                        <input type="time" class="form-control" onchange="onTimeChange('Bcltime','cltime')" id="cltime"/>
+                                        
+                                        <input type="text" id="Bcltime" hidden/>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-12 my-2 form-group">
+                                <textarea class="form-control" id="bdetail"></textarea>
+                                <input type="text" id="fullhtmldetail" hidden/>
+                            </div>
+                            <div class="col-12 my-2 form-group text-center" id="subbtn">
+                                <a class="btn btn-primary text-white rounded-pill px-5 py-2 mt-2" id="Adddetailbtn">Add Details</a>
+                            </div>
+                            <div class="col-12 my-2 form-group text-center hidediv" id="probtn">
+                                <a class="btn btn-primary text-white rounded-pill px-5 py-2 mt-2" id="Adddetailbtn">Processing</a>
+                            </div>
+                        </div>
+                    
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extrascript %}
+    <script>
+        var ProductList = `<option value="Please Select">Please Select</option>`;
+        var ServiceList = `<option value="Please Select">Please Select</option>`;
+        $(document).ready(function(){
+            getAllCategory();
+        });
+        
+        function getAllCategory(){
+            $.ajax({
+                type:'POST',
+                data:{
+                    csrfmiddlewaretoken:'{{ csrf_token }}',
+                    req:'GetBusinessCategory'
+                },
+                success:function(response){
+                    var res = response['data']['response'];
+                    var data = response['data']['data'];
+                    if(res)
+                    {
+                        for(let i=0;i<data.length;i++)
+                        {
+                            if(data[i]['status']==1)
+                            {
+                                if(data[i]['type'] == 'Product')
+                                {
+                                    ProductList+=`<option value="`+data[i]['category']+`">`+data[i]['category']+`</option>`;
+                                }
+                                if(data[i]['type'] == 'Service')
+                                {
+                                    ServiceList+=`<option value="`+data[i]['category']+`">`+data[i]['category']+`</option>`;
+                                }
+                            }
+                        }
+                    }
+                },
+                error:function(response){
+
+                },
+            });
+            console.log('ProductList : '+ProductList);
+            console.log('ServiceList : '+ServiceList);
+        }
+
+        $("#btype").change(function () {
+            var val = $(this).val();
+            if (val == "Please Select") {
+                $("#bcategory").html(`<option value="Please Select">Please Select</option>`);
+            } else if (val == "Service") {
+                $("#bcategory").html(ServiceList);
+            } else if (val == "Product") {
+                $("#bcategory").html(ProductList);
+            }
+            $('#Fbcategory').val('Please Select');
+            console.log('Fbcategory : '+$('#Fbcategory').val());
+            $('#Fbtype').val(val);
+        });
+        $("#bcategory").change(function () {
+            var val = $(this).val();
+            $('#Fbcategory').val(val);
+            console.log('Fbcategory : '+$('#Fbcategory').val());
+        });
+
+        function AddNewCategory(){
+            var Ltype = $('#Cbtype').val();
+            var Lcategory = $('#Cbcategory').val();
+            if(Ltype != '' && Lcategory != '')
+            {
+                $.ajax({
+                    type:'POST',
+                    data:{
+                        csrfmiddlewaretoken:'{{ csrf_token }}',
+                        req:'AddNewCategory',
+                        type:Ltype,
+                        category:Lcategory,
+                    },
+                    success:function(response){
+                        var data = response['data']['response'];
+                        if(data)
+                        {
+                            $("#btype").html(`<option value="`+Ltype+`">`+Ltype+`</option>`);
+                            $("#bcategory").html(`<option value="`+Lcategory+`">`+Lcategory+`</option>`);
+                            $('#Fbtype').val(Ltype);
+                            $('#Fbcategory').val(Lcategory);
+                        }
+                    },
+                    error:function(response){
+
+                    }
+                });
+            }else{
+                Toastmessage('Enter New Category');
+            }
+        }
+    </script>
+    <script>
+        var imagebase64 = "";  
+        function encodeImageFileAsURL(element) {  
+            var file = element.files[0];  
+            var reader = new FileReader();  
+            reader.onloadend = function() {  
+                imagebase64 = reader.result;  
+                console.log('imagebase64 is ',imagebase64);  
+                $('#ProfileImage').attr('src',imagebase64);
+                $('#imgurl').val(imagebase64);
+            }  
+            reader.readAsDataURL(file);
+        }  
+        $('#ProfileImage').click(function(){
+            $('#imagefile').click();
+        });
+
+        function onTimeChange(putid,getid){
+            var inputEle = document.getElementById(getid);
+                var timeSplit = inputEle.value.split(':'),hours,minutes,meridian;
+                hours = timeSplit[0];
+                minutes = timeSplit[1];
+                if (hours > 12) {
+                    meridian = 'PM';
+                    hours -= 12;
+                } else if (hours < 12) {
+                    meridian = 'AM';
+                    if (hours == 0) {
+                    hours = 12;
+                    }
+                } else {
+                    meridian = 'PM';
+                }
+                $('#'+putid+'show').html(hours + ':' + minutes + ' ' + meridian);
+                $('#'+putid).val(hours + ':' + minutes + ' ' + meridian);
+                
+            }
+
+    </script>
+    <script>
+        tinymce.init({
+      selector: 'textarea#bdetail',
+      setup:function(ed) {
+          ed.on('input', function(e) {
+              //ajaxfunction(this, ed.getContent({format : 'text'}))
+              $('#fullhtmldetail').val(ed.getContent({format : 'html'}));
+              console.log('value is : '+$('#fullhtmldetail').val());
+          });
+          ed.on('keyup', function(e) {
+              $('#fullhtmldetail').val(ed.getContent({format : 'html'}));
+              console.log('value is : '+$('#fullhtmldetail').val());
+          });
+      },
+      plugins: 'advlist autolink lists link image charmap print preview hr anchor pagebreak',
+      toolbar_mode: 'floating',
+        });
+    </script>
+    
+    <script>
+        $('#Adddetailbtn').click(function(){
+            //Toastmessage('Hello Kajal');
+            if($('#imgurl').val()=='')
+            {   
+                $('#ProfileImage').addClass('errorborder');
+                Toastmessage('Add your Business Logo');
+            }else{
+                $('#ProfileImage').removeClass('errorborder');
+                if($('#Bname').val()=='')
+                {   
+                    $('#Bname').addClass('errorborder');
+                    Toastmessage('Add your Business Name');
+                }else{
+                    $('#Bname').removeClass('errorborder');
+                    if($('#Bemail').val()=='')
+                    {
+                        $('#Bemail').addClass('errorborder');
+                        Toastmessage('Add your Business Email');
+                    }else{
+                        $('#Bemail').removeClass('errorborder');
+                        if($('#btype').val()=='Please Select')
+                        {
+                            $('#btype').addClass('errorborder');
+                            Toastmessage('Add your Business Type');
+                        }else{
+                            $('#btype').removeClass('errorborder');
+                            if($('#Fbcategory').val()=='Please Select')
+                            {
+                                $('#bcategory').addClass('errorborder');
+                                Toastmessage('Add your Business Category');
+                            }else{
+                                $('#bcategory').removeClass('errorborder');
+                                if($('#Boptime').val()=='')
+                                {
+                                    $('#optime').addClass('errorborder');
+                                    Toastmessage('Add your Business Opening Time');
+                                }else{
+                                    $('#optime').removeClass('errorborder');
+                                    if($('#Bcltime').val()=='')
+                                    {
+                                        $('#cltime').addClass('errorborder');
+                                        Toastmessage('Add your Business Closing Time');
+                                    }else{
+                                        $('#cltime').removeClass('errorborder');
+                                        if($('#fullhtmldetail').val()=='')
+                                        {
+                                            $('#bdetail').addClass('errorborder');
+                                            Toastmessage('Add your Business Description');
+                                        }else{
+                                            $('#bdetail').removeClass('errorborder');
+                                            $('#subbtn').addClass('hidediv').fadeOut(1000);
+                                            $('#probtn').removeClass('hidediv').fadeIn(1100);
+                                            var logo = $('#imgurl').val();
+                                            var Bname = $('#Bname').val();
+                                            var Bemail = $('#Bemail').val();
+                                            var Btype = $('#btype').val();
+                                            var Bcategory = $('#bcategory').val();
+                                            var Boptime = $('#Boptime').val();
+                                            var Bcltime = $('#Bcltime').val();
+                                            var BDesc = $('#fullhtmldetail').val();
+                                            $.ajax({
+                                                type:'POST',
+                                                data:{
+                                                    csrfmiddlewaretoken:'{{ csrf_token }}',
+                                                    req:'AddBusiness',
+                                                    logo:logo,
+                                                    Bname:Bname,
+                                                    Bemail:Bemail,
+                                                    Btype:Btype,
+                                                    Bcategory:Bcategory,
+                                                    Boptime:Boptime,
+                                                    Bcltime:Bcltime,
+                                                    BDesc:BDesc,
+                                                },
+                                                success:function(response){
+                                                    var data = response['data']['response'];
+                                                    if(data){
+                                                        location.href = "/";
+                                                    }
+                                                },
+                                                error:function(response){
+
+                                                },
+                                            });
+                                        }       
+                                    }   
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    </script>
+
+
+{% endblock %}
