@@ -10,7 +10,6 @@ from API import config,utils
 
 # Create your views here.
 def login(request):
-
     if request.method == "POST" and 'VerifyMobilePass' in request.POST:
         print('VerifyMobilePass function is called')
         mobileno=request.POST.get('hiddenno')
@@ -44,7 +43,8 @@ def login(request):
                 'avatar':request.session['lfvuserprofile'],
                 'country':request.session['lfvusercountry']
             }
-            return render(request,'Dashboard/index.html',{'userdata':userdata})
+            #return render(request,'Dashboard/index.html',{'userdata':userdata})
+            return redirect('index')
         elif response['status']=='2':
             request.session['lfvloginstatus']=response['status']
             request.session['islfvuserlogin']=False
@@ -121,7 +121,9 @@ def business(request):
             url = utils.makeup_url('crudbusiness.py')
             payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
             AllBusiness = requests.post(url,data=payload).json()
-            return render(request,'Business/viewbusiness.html',{'userdata':userdata,'AllBusiness':AllBusiness})
+            payload = {'req':'getservice','mobile':request.session['lfvusermobile']}
+            Businessservice = requests.post(url,data=payload).json()
+            return render(request,'Business/viewbusiness.html',{'userdata':userdata,'AllBusiness':AllBusiness,'Businessservice':Businessservice['data']})
         else:
             return redirect('login')
     else:

@@ -114,7 +114,29 @@
                                     </div>
                                 </div>
                             </div>  
+                            <div class="col-12 my-2">
+                                <div class="text-right">
+                                    
+                                </div>
+                                {% for sdt in Businessservice %}
+                                    {% if  sdt.category == bus.category %}
+                                        <div class="card shadow mt-1 py-2 px-4">
+                                            <div class="row">
+                                                <div class="col-md-10 text-left">
+                                                    <h1>{{sdt.name}}</h1>
+                                                    <p> Price :{{sdt.price}} / {{sdt.pricetype}}</br>
+                                                    {{sdt.description}}</p>
+                                                </div>
+                                                <div class="col-md-2 text-right d-flex">
+                                                    <a class="btn btn-sm btn-primary text-white rounded ml-auto my-auto">Delete</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
                         </div>
+
                 {% endfor %}
             {% else %}
             {% endif %}
