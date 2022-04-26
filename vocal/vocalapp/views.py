@@ -107,6 +107,12 @@ def index(request):
 def business(request):
     if 'islfvuserlogin' in request.session:
         if request.session['islfvuserlogin']:
+            if request.method == "POST" and 'AddNewService' in request.POST :
+                url = utils.makeup_url('crudbusiness.py')
+                payload = {'req':'addbservice','mobile':request.session['lfvusermobile'],'category':request.POST.get('Scategory'),'name':request.POST.get('SName'),'price':request.POST.get('SPrice'),'pricetype':request.POST.get('SPricetype'),'description':request.POST.get('SDecscription'),}
+                print(payload)
+                response = requests.post(url,data=payload).json()
+                return redirect('business')
             userdata = {
                 'name':request.session['lfvusername'],
                 'email':request.session['lfvuseremail'],
@@ -121,9 +127,10 @@ def business(request):
             url = utils.makeup_url('crudbusiness.py')
             payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
             AllBusiness = requests.post(url,data=payload).json()
+            AllBusinessdata = AllBusiness['data'][0]
             payload = {'req':'getservice','mobile':request.session['lfvusermobile']}
             Businessservice = requests.post(url,data=payload).json()
-            return render(request,'Business/viewbusiness.html',{'userdata':userdata,'AllBusiness':AllBusiness,'Businessservice':Businessservice['data']})
+            return render(request,'Business/viewbusiness.html',{'userdata':userdata,'AllBusiness':AllBusiness,'Businessservice':Businessservice['data'],'AllBusinessdata':AllBusinessdata})
         else:
             return redirect('login')
     else:

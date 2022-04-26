@@ -15,7 +15,44 @@
       }
   </style>
   <body class="nav-fixed" style="background:#F6F7FB">
+    <div class="modal fade" id="AddNewServiceModel" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLongTitle">Add New Service</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <form method="POST">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="row">
+                        <input type="text" id="Scategory" name="Scategory" value="{{AllBusinessdata.category}}" hidden/>
+                        <div class="col-md-6 form-group">
+                            <input class="form-control" type="text" id="SName" name="SName" placeholder="Service Name" />
+                        </div>
+                        <div class="col-md-6 form-group">
+                            <input class="form-control" type="text" id="SPrice" name="SPrice" placeholder="Price" />
+                        </div>
+                        <div class="col-12 form-group">
+                            <input class="form-control" type="text" id="SPricetype" name="SPricetype" placeholder="Price Type eg. Per KG, Per Unit,Per Hour" />
+                        </div>
+                        <div class="col-12 form-group">
+                            <textarea class="form-control" type="text" id="SDecscription" name="SDecscription" placeholder="Description" >
 
+                            </textarea>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                <button type="submit" name="AddNewService" class="btn btn-primary" >Save changes</button>
+                </div>
+            </form>
+          </div>
+        </div>
+      </div>
     <nav class="topnav mb-3 navbar py-0 px-5  navbar-expand shadow navbar-light bg-white" id="sidenavAccordion">
         <a class="pl-2" href="#"><img src="{% static 'image/logo1.png' %}" alt="flipped-ai" style="height: 5rem;"></a>
         <button class="btn btn-icon btn-transparent-dark order-1 order-lg-0 mr-lg-2" id="sidebarToggle" href="#"><i data-feather="menu"></i></button>          
@@ -85,41 +122,48 @@
         <div class="text-left">
             <h3>Your Business Detail is : -</h3>
             {% if AllBusiness.response %}
-                {% for bus in AllBusiness.data %}
                         <div class="row">
                             <!--AllBusiness-->
                             <div class="col-md-4 text-center form-group">
-                                <img class="img-fluid rounded" style="max-height:20rem"  src="{{bus.bannerimg}}" />
+                                <img class="img-fluid rounded" style="max-height:20rem"  src="{{AllBusinessdata.bannerimg}}" />
                             </div>
                             <div class="col-md-8 text-center form-group">
                                 <div class="row" style="max-height:20rem;overflow-y:scroll">
                                     <div class="col-6 text-left form-group">
                                         <label for="Pbname">Business Name</label>
-                                        <input type="text" class="inputfield form-control" id="Pbname" value="{{bus.bname}}" disabled/>
+                                        <input type="text" class="inputfield form-control" id="Pbname" value="{{AllBusinessdata.bname}}" disabled/>
                                     </div>
                                     <div class="col-6 text-left form-group">
                                         <label for="Pemail">Business email</label>
-                                        <input type="text" class="inputfield form-control" id="Pemail" value="{{bus.email}}" disabled/>
+                                        <input type="text" class="inputfield form-control" id="Pemail" value="{{AllBusinessdata.email}}" disabled/>
                                     </div>
                                     <div class="col-6 text-left form-group">
                                         <label for="Pcategory">Business Category</label>
-                                        <input type="text" class="inputfield form-control" id="Pemail" value="{{bus.category}}" disabled/>
+                                        <input type="text" class="inputfield form-control" id="Pemail" value="{{AllBusinessdata.category}}" disabled/>
                                     </div>
                                     <div class="col-6 text-left form-group">
                                         <label for="Ptiming">Timing</label>
-                                        <input type="text" class="inputfield form-control" id="Ptiming" value="{{bus.timing}}" disabled/>
+                                        <input type="text" class="inputfield form-control" id="Ptiming" value="{{AllBusinessdata.timing}}" disabled/>
                                     </div>
                                     <div class="col-12 text-left ">
-                                        {{bus.promotion |safe }}
+                                        {{AllBusinessdata.promotion |safe }}
                                     </div>
                                 </div>
                             </div>  
-                            <div class="col-12 my-2">
-                                <div class="text-right">
-                                    
+                            <div class="col-12 mb-4">
+                                <div class="row">
+                                    <div class="col-6 text-left">
+                                        <h5>Services provide by you : -</h5>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#AddNewServiceModel">
+                                          Add New Service
+                                        </button>
+                                    </div>
                                 </div>
+
                                 {% for sdt in Businessservice %}
-                                    {% if  sdt.category == bus.category %}
+                                    {% if  sdt.category == AllBusinessdata.category %}
                                         <div class="card shadow mt-1 py-2 px-4">
                                             <div class="row">
                                                 <div class="col-md-10 text-left">
@@ -136,11 +180,8 @@
                                 {% endfor %}
                             </div>
                         </div>
-
-                {% endfor %}
             {% else %}
             {% endif %}
-            <h5>Services provide by you : -</h5>
         </div>
     </div>
     
