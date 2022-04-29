@@ -43,7 +43,6 @@ def login(request):
                 'avatar':request.session['lfvuserprofile'],
                 'country':request.session['lfvusercountry']
             }
-            #return render(request,'Dashboard/index.html',{'userdata':userdata})
             return redirect('index')
         elif response['status']=='2':
             request.session['lfvloginstatus']=response['status']
@@ -84,6 +83,22 @@ def login(request):
 def index(request):
     if 'islfvuserlogin' in request.session:
         if request.session['islfvuserlogin']:
+            #GetLocalCity
+            if request.method == "POST" and request.POST.get('req') == 'GetLocalCity':
+                url = utils.makeup_url('cruddash.py')
+                payload = {'req':'GetLocalCity','state':request.POST.get('state'),'city':request.POST.get('city')}
+                print(payload)
+                response = requests.post(url,data = payload).json()
+                print(response)
+                return JsonResponse({'data':response},status=200)
+
+            if request.method == "POST" and request.POST.get('req') == 'getThings':
+                url = utils.makeup_url('crudthings.py')
+                payload = {'req':'getThings','country':'India','state':request.POST.get('state'),'city':request.POST.get('city')}
+                print(payload)
+                response = requests.post(url,data=payload).json()
+                print(response)
+                return JsonResponse({'data':response},status=200)
             userdata = {
                 'name':request.session['lfvusername'],
                 'email':request.session['lfvuseremail'],
