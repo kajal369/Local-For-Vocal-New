@@ -101,7 +101,7 @@
     <header class=" py-4 mt-1 text-center" style="background-color:#8ba4f1">
         <div class="row">
             <div class="col-md-4">
-                <h4 >your city <span class="text-white">{{userdata.city}}</span></h4>
+                <h4 >Your city <span class="text-white">{{userdata.city}}</span></h4>
                 <div class="row mx-3">
                     <div class="col-md-6 form-group">
                         <select class="form-control" id="DashState">
@@ -159,11 +159,15 @@
                 
 
             </div>
-            <div class="col-md-4">
-                <select class="js-example-basic-single" name="state">
-                    <option value="AL">Alabama</option>
-                    <option value="WY">Wyoming</option>
-                  </select>
+            <div class="col-md-2 form-group">
+                <div id="servicecont">
+                    <h4>Select Service </h4>
+                    <select  name="state" class="form-control" id="Selectservicecate" >
+                        <option value="SService">Select Service</option>
+                        <option value="AL">Alabama</option>
+                        <option value="WY">Wyoming</option>
+                    </select>
+                </div>
             </div>
             <div class="col-md-4">
             </div>
@@ -371,17 +375,28 @@
                     },
                 });
             });
+
+            $("#DashLCity").change(function(){
+                var state = $('#DashState').val();
+                var city = $('#DashCity').val();
+                var lcity = $('#DashLCity').val();
+                if(state != 'SelectState' && city != 'SelectCity' && city != 'SelectLCity'){
+                    getcategorybycondition(state,city,lcity);
+                }
+            });
         </script>
     <script>
         $(document).ready(function() {
-            $('.js-example-basic-single').select2();
+            //$('.js-example-basic-single').select2();
         });
         $(document).ready(function(){
             getThings('{{userdata.state}}','{{userdata.city}}');
+            getcategorybycondition('{{userdata.state}}','{{userdata.city}}','{{userdata.Lcity}}')
         });
 
 
         function getThings(state,city){
+            console.log('inside getThings'+state+' '+city);
             $.ajax({
                 type:'POST',
                 data:{
@@ -449,6 +464,115 @@
                 },
                 error:function(response){
                     console.log('Ajax Error ! ');
+                }
+            });
+        }
+
+        function getcategorybycondition(state,city,lcity){
+            $('#servicecont').addClass('hidediv');
+            $.ajax({
+                type:'POST',
+                data:{
+                    csrfmiddlewaretoken:'{{ csrf_token }}',
+                    req:'getcategorybycondition',
+                    state:state,
+                    city:city,
+                    lcity:lcity,
+                },
+                success:function(response){
+                    var data = response['data'];
+                    var post = `<option value="SService">Select Service</option>`;
+                    if(data['response']){
+                        for(let i=0;i<data['data'].length;i++){
+                            post += `<option value="`+data['data'][i]+`">`+data['data'][i]+`</option>`;
+                        }
+
+                    }
+                    $('#Selectservicecate').html(post);
+                    $('#servicecont').removeClass('hidediv');
+                },
+                error:function(response){
+                    console.log('getcategorybycondition ajax error');
+                }
+            });
+
+
+        }
+
+        function getcategorybycondition(state,city,lcity){
+            $('#servicecont').addClass('hidediv');
+            $.ajax({
+                type:'POST',
+                data:{
+                    csrfmiddlewaretoken:'{{ csrf_token }}',
+                    req:'getcategorybycondition',
+                    state:state,
+                    city:city,
+                    lcity:lcity,
+                },
+                success:function(response){
+                    var data = response['data'];
+                    var post = `<option value="SService">Select Service</option>`;
+                    if(data['response']){
+                        for(let i=0;i<data['data'].length;i++){
+                            post += `<option value="`+data['data'][i]+`">`+data['data'][i]+`</option>`;
+                        }
+
+                    }
+                    $('#Selectservicecate').html(post);
+                },
+                error:function(response){
+                    console.log('getcategorybycondition ajax error');
+                }
+            });
+
+
+        }
+
+
+        $('#Selectservicecate').change(function(){
+            var service = $('#Selectservicecate').val();
+            if(service == 'SService')
+            {
+                service = 'All';
+            }
+            var state = $('#DashState').val();
+            if(state == 'SelectState')
+            {
+                state = '{{userdata.state}}';
+            }
+            var city = $('#DashCity').val();
+            if(city == 'SelectCity')
+            {
+                city = '{{userdata.state}}';
+            }
+            var lcity = $('#DashLCity').val();
+            if(lcity == 'SelectLCity') 
+            {
+                lcity = '{{userdata.Lcity}}';
+            }
+
+            getServiceList(state,city,lcity,service);
+
+        });
+
+
+        function getServiceList(state,city,lcity,service){
+            $.ajax({
+                type:'POST',
+                data:{
+                    csrfmiddlewaretoken:'{{ csrf_token }}',
+                    req:'getServiceList',
+                    state:state,
+                    city:city,
+                    lcity:lcity,
+                    service:service,
+                },
+                success:function(response){
+                    var data = response['data'];
+                },
+                error:function(response){
+
                 }
             });
         }

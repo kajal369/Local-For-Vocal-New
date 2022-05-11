@@ -15,8 +15,9 @@ def login(request):
         mobileno=request.POST.get('hiddenno')
         password=request.POST.get('hiddenpass')
         url = utils.makeup_url('cruduser.py')
+        print(url)
         payload = {'req':'checklogin','mobile':mobileno,'password':password}
-        #print(payload)
+        print(payload)
         response = requests.post(url,data=payload).json()
         if response['response']:
             request.session['isregistration']=False
@@ -83,6 +84,28 @@ def login(request):
 def index(request):
     if 'islfvuserlogin' in request.session:
         if request.session['islfvuserlogin']:
+            #getServiceList
+            if request.method == "POST" and request.POST.get('req') == 'getServiceList':
+                state=request.POST.get('state')
+                city=request.POST.get('city')
+                lcity=request.POST.get('lcity')
+                service=request.POST.get('service')
+                url = utils.makeup_url('crudbusiness.py')
+                payload = {'req':'getServiceList','country':'India','state':state,'city':city,'lcity':lcity,'service':service}
+                response = requests.post(url,data=payload).json()
+                return JsonResponse({'data':response},status=200)
+
+            #getcategorybycondition
+            if request.method == "POST" and request.POST.get('req') == 'getcategorybycondition':
+                state=request.POST.get('state')
+                city=request.POST.get('city')
+                lcity=request.POST.get('lcity')
+                url = utils.makeup_url('crudbusiness.py')
+                payload = {'req':'getcategorybycondition','country':'India','state':state,'city':city,'lcity':lcity}
+                print(payload)
+                response = requests.post(url,data=payload).json()
+                return JsonResponse({'data':response},status=200)
+
             #GetLocalCity
             if request.method == "POST" and request.POST.get('req') == 'GetLocalCity':
                 url = utils.makeup_url('cruddash.py')
@@ -93,6 +116,7 @@ def index(request):
                 return JsonResponse({'data':response},status=200)
 
             if request.method == "POST" and request.POST.get('req') == 'getThings':
+                print('inside getthings')
                 url = utils.makeup_url('crudthings.py')
                 payload = {'req':'getThings','country':'India','state':request.POST.get('state'),'city':request.POST.get('city')}
                 print(payload)
