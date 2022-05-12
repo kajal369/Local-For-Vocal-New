@@ -164,8 +164,6 @@
                     <h4>Select Service </h4>
                     <select  name="state" class="form-control" id="Selectservicecate" >
                         <option value="SService">Select Service</option>
-                        <option value="AL">Alabama</option>
-                        <option value="WY">Wyoming</option>
                     </select>
                 </div>
             </div>
@@ -194,7 +192,7 @@
             var JammuKashmir = ["Anantnag","Bandipora","Baramulla","Budgam","Doda","Ganderbal","Jammu","Kargil","Kathua","Kishtwar","Kulgam","Kupwara","Leh","Poonch","Pulwama","Rajouri","Ramban","Reasi","Samba","Shopian","Srinagar","Udhampur"];
             var Jharkhand = ["Bokaro","Chatra","Deoghar","Dhanbad","Dumka","East Singhbhum","Garhwa","Giridih","Godda","Gumla","Hazaribagh","Jamtara","Khunti","Koderma","Latehar","Lohardaga","Pakur","Palamu","Ramgarh","Ranchi","Sahebganj","Seraikela Kharsawan","Simdega","West Singhbhum"];
             var Karnataka = ["Bagalkot","Bangalore Rural","Bangalore Urban","Belgaum","Bellary","Bidar","Vijayapura","Chamarajanagar","Chikkaballapur","Chikkamagaluru","Chitradurga","Dakshina Kannada","Davanagere","Dharwad","Gadag","Gulbarga","Hassan","Haveri","Kodagu","Kolar","Koppal","Mandya","Mysore","Raichur","Ramanagara","Shimoga","Tumkur","Udupi","Uttara Kannada","Yadgir"];
-            var Kerala = ["Alappuzha","Ernakulam","Idukki","Kannur","Kasaragod","Kollam","Kottayam","Kozhikode","Malappuram","Palakkad","Pathanamthitta","Thiruvananthapuram","Thrissur","Wayanad"];
+            var Kerala = ["Alattur","Alleppi","Alappuzha","Ernakulam","Idukki","Kannur","Kasaragod","Kollam","Kottayam","Kozhikode","Malappuram","Palakkad","Pathanamthitta","Thiruvananthapuram","Thrissur","Wayanad"];
             var MadhyaPradesh = ["Agar Malwa","Alirajpur","Anuppur","Ashoknagar","Balaghat","Barwani","Betul","Bhind","Bhopal","Burhanpur","Chhatarpur","Chhindwara","Damoh","Datia","Dewas","Dhar","Dindori","Guna","Gwalior","Harda","Hoshangabad","Indore","Jabalpur","Jhabua","Katni","Khandwa","Khargone","Mandla","Mandsaur","Morena","Narsinghpur","Neemuch","Panna","Raisen","Rajgarh","Ratlam","Rewa","Sagar","Satna",
             "Sehore","Seoni","Shahdol","Shajapur","Sheopur","Shivpuri","Sidhi","Singrauli","Tikamgarh","Ujjain","Umaria","Vidisha"];
             var Maharashtra = ["Ahmednagar","Akola","Amravati","Aurangabad","Beed","Bhandara","Buldhana","Chandrapur","Dhule","Gadchiroli","Gondia","Hingoli","Jalgaon","Jalna","Kolhapur","Latur","Mumbai City","Mumbai Suburban","Nagpur","Nanded","Nandurbar","Nashik","Osmanabad","Palghar","Parbhani","Pune","Raigad","Ratnagiri","Sangli","Satara","Sindhudurg","Solapur","Thane","Wardha","Washim","Yavatmal"];
@@ -347,6 +345,7 @@
                 $("#DashLCity").html(`<option value="SelectLCity">-- Select One -- </option>`);
                 var state = $('#DashState').val();
                 var city = $('#DashCity').val();
+                getThings(state,city);
                 $.ajax({
                     type:'POST',
                     data:{
@@ -486,8 +485,8 @@
                         for(let i=0;i<data['data'].length;i++){
                             post += `<option value="`+data['data'][i]+`">`+data['data'][i]+`</option>`;
                         }
-
                     }
+                    console.log(post);
                     $('#Selectservicecate').html(post);
                     $('#servicecont').removeClass('hidediv');
                 },
@@ -499,39 +498,12 @@
 
         }
 
-        function getcategorybycondition(state,city,lcity){
-            $('#servicecont').addClass('hidediv');
-            $.ajax({
-                type:'POST',
-                data:{
-                    csrfmiddlewaretoken:'{{ csrf_token }}',
-                    req:'getcategorybycondition',
-                    state:state,
-                    city:city,
-                    lcity:lcity,
-                },
-                success:function(response){
-                    var data = response['data'];
-                    var post = `<option value="SService">Select Service</option>`;
-                    if(data['response']){
-                        for(let i=0;i<data['data'].length;i++){
-                            post += `<option value="`+data['data'][i]+`">`+data['data'][i]+`</option>`;
-                        }
-
-                    }
-                    $('#Selectservicecate').html(post);
-                },
-                error:function(response){
-                    console.log('getcategorybycondition ajax error');
-                }
-            });
-
-
-        }
-
+        
 
         $('#Selectservicecate').change(function(){
+
             var service = $('#Selectservicecate').val();
+
             if(service == 'SService')
             {
                 service = 'All';
@@ -544,14 +516,15 @@
             var city = $('#DashCity').val();
             if(city == 'SelectCity')
             {
-                city = '{{userdata.state}}';
+                city = '{{userdata.city}}';
             }
             var lcity = $('#DashLCity').val();
             if(lcity == 'SelectLCity') 
             {
                 lcity = '{{userdata.Lcity}}';
-            }
 
+            }
+            console.log(state,city,lcity,service)
             getServiceList(state,city,lcity,service);
 
         });
@@ -570,6 +543,58 @@
                 },
                 success:function(response){
                     var data = response['data'];
+                    if(data['response']){
+                        $('#mainpagecontainer').html(`
+                        <div class="text-center py-10">
+                            <h1>Loading <i class="fa fa-spinner" aria-hidden="true"></i></h1>
+                        </div>
+                        `);
+                        var post = '';
+                        for(let i=0;i<data['data'].length;i++){
+                            post+=`
+                            <div class="card px-4 py-3 rounded mt-2 shadow">
+                                <div class="row mt-1">
+                                    <div class="col-md-3">
+                                        <img class="img-fluid rounded" src="`+data['data'][i]['bannerimg']+`" />
+                                    </div>
+                                    <div class="col-md-9">
+                                        <div class="row">
+                                            <div class="col-md-6 text-left ">
+                                                <h3>`+data['data'][i]['bname']+`</h3>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <a class="textr-primary">`+data['data'][i]['category']+`</a>
+                                            </div>
+                                            <div class="col-md-6 text-left ">
+                                                <a>`+data['data'][i]['email']+`</a>
+                                            </div>
+                                            <div class="col-md-6 text-right">
+                                                <a>`+data['data'][i]['mobile']+`</a>
+                                            </div>
+                                            <div class="col-md-6 text-left">
+                                                <a >Timing : `+data['data'][i]['timing']+`</a>
+                                            </div>
+
+                                            <div class="col-12 text-left">
+                                                <a > `+data['data'][i]['promotion']+`</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            `
+                        }
+                        $('#mainpagecontainer').html(post);
+                    }
+                    else{
+                        $('#mainpagecontainer').html(`
+                        <div class="text-center pt-10 mt-10 ">
+                            <br/>
+                            <h1 class="pt-10">Service Not Available !</h1>
+                        </div>
+                        `);
+                    }
                 },
                 error:function(response){
 
