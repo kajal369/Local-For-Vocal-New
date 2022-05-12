@@ -62,6 +62,8 @@ def login(request):
     if 'islfvuserlogin' in request.session:
         if request.session['islfvuserlogin']:
             islogin=True
+            userdata = GetUserDetail(request.session['lfvusermobile'])
+            '''
             userdata = {
                 'name':request.session['lfvusername'],
                 'email':request.session['lfvuseremail'],
@@ -73,6 +75,7 @@ def login(request):
                 'avatar':request.session['lfvuserprofile'],
                 'country':request.session['lfvusercountry']
             }
+            '''
             url = utils.makeup_url('crudbusiness.py')
             payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
             AllBusiness = requests.post(url,data=payload).json()
@@ -90,9 +93,11 @@ def index(request):
                 city=request.POST.get('city')
                 lcity=request.POST.get('lcity')
                 service=request.POST.get('service')
-                url = utils.makeup_url('crudbusiness.py')
-                payload = {'req':'getServiceList','country':'India','state':state,'city':city,'lcity':lcity,'service':service}
+                url = utils.makeup_url('cruddash.py')
+                payload = {'req':'GetServiceList','country':'India','state':state,'city':city,'lcity':lcity,'service':service}
+                print(payload)
                 response = requests.post(url,data=payload).json()
+                print('GetServiceList : ',response['response'])
                 return JsonResponse({'data':response},status=200)
 
             #getcategorybycondition
@@ -123,6 +128,8 @@ def index(request):
                 response = requests.post(url,data=payload).json()
                 print(response)
                 return JsonResponse({'data':response},status=200)
+            userdata = GetUserDetail(request.session['lfvusermobile'])
+            '''
             userdata = {
                 'name':request.session['lfvusername'],
                 'email':request.session['lfvuseremail'],
@@ -134,6 +141,7 @@ def index(request):
                 'avatar':request.session['lfvuserprofile'],
                 'country':request.session['lfvusercountry']
             }
+            '''
             url = utils.makeup_url('crudbusiness.py')
             payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
             AllBusiness = requests.post(url,data=payload).json()
@@ -152,6 +160,8 @@ def business(request):
                 print(payload)
                 response = requests.post(url,data=payload).json()
                 return redirect('business')
+            userdata = GetUserDetail(request.session['lfvusermobile'])
+            '''
             userdata = {
                 'name':request.session['lfvusername'],
                 'email':request.session['lfvuseremail'],
@@ -163,6 +173,7 @@ def business(request):
                 'avatar':request.session['lfvuserprofile'],
                 'country':request.session['lfvusercountry']
             }
+            '''
             url = utils.makeup_url('crudbusiness.py')
             payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
             AllBusiness = requests.post(url,data=payload).json()
@@ -232,7 +243,7 @@ def newbusiness(request):
                 timing = str(Boptime)+' to '+str(Bcltime)
                 BDesc=request.POST.get('BDesc')
                 url = utils.makeup_url('crudbusiness.py')
-                payload = {'req':'addbusiness','mobile':mobile,'name':Bname,'category':Bcategory,'image':logo,'timing':timing,'email':Bemail,'promotion':BDesc,'type':Btype}
+                payload = {'req':'addbusiness','mobile':mobile,'name':Bname,'category':Bcategory,'image':logo,'timing':timing,'email':Bemail,'promotion':BDesc,'type':Btype,'country':'India','state':request.session['lfvuserstate'],'city':request.session['lfvusercity'],'lcity':request.session['lfvuserlcity']}
                 response = requests.post(url,data=payload).json()
                 return JsonResponse({'data':response},status=200)
             return render(request,'Business/AddnewBusiness.html')
@@ -315,6 +326,25 @@ def registration(request):
     errormsg = "NA"            
     progressstep = {"step1":True,"step2":False,"step3":False,"step4":False}
     return render(request,'signup/registration.html',{'progress':progressstep,'iserror':iserror,'errormsg':errormsg,})
+
+
+def GetUserDetail(mobile):
+    url = utils.makeup_url('cruduser.py')
+    payload = {'req':'GetUserDetail','mobile':mobile}
+    print(payload)
+    response = requests.post(url,data=payload).json()
+    userdata = {
+                'name':response['name'],
+                'email':response['email'],
+                'mobile':response['mobile'],
+                'state':response['state'],
+                'city':response['city'],
+                'Lcity':response['lcity'],
+                'isbusiness':response['business'],
+                'avatar':response['avatar'],
+                'country':response['country'],
+            }
+    return userdata
 
 def getAllBusinessCategory():
     url = utils.makeup_url('crudbusiness.py')
