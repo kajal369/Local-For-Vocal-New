@@ -120,13 +120,21 @@ def index(request):
                 print(response)
                 return JsonResponse({'data':response},status=200)
 
+            #AddFamouseThings
+            if request.method == "POST" and request.POST.get('req') == 'AddFamouseThings':
+                print(' inside AddFamouseThings')
+                url = utils.makeup_url('crudthings.py')
+                
+                payload = {'req':'addThings','country':'India','state':request.POST.get('state'),'city':request.POST.get('city'),'name':request.POST.get('name'),'type':request.POST.get('type'),'description':request.POST.get('description'),'address':request.POST.get('address'),'adderid':request.session['lfvusermobile'],'status':'0','feedback':request.POST.get('feedback'),'img1':request.POST.get('img1'),'img2':request.POST.get('img2'),'img3':request.POST.get('img3')}
+                response = requests.post(url,data=payload).json()
+                return JsonResponse({'data':response},status=200)
             if request.method == "POST" and request.POST.get('req') == 'getThings':
                 print('inside getthings')
                 url = utils.makeup_url('crudthings.py')
                 payload = {'req':'getThings','country':'India','state':request.POST.get('state'),'city':request.POST.get('city')}
                 print(payload)
                 response = requests.post(url,data=payload).json()
-                print(response)
+                print('totalimage',response['data'][0]['totalimage'])
                 return JsonResponse({'data':response},status=200)
             userdata = GetUserDetail(request.session['lfvusermobile'])
             '''
@@ -142,6 +150,8 @@ def index(request):
                 'country':request.session['lfvusercountry']
             }
             '''
+
+
             url = utils.makeup_url('crudbusiness.py')
             payload = {'req':'getAllBusiness','mobile':request.session['lfvusermobile']}
             AllBusiness = requests.post(url,data=payload).json()
